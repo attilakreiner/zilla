@@ -14,7 +14,6 @@
  */
 package io.aklivity.zilla.runtime.command.metrics.internal.airline;
 
-import static io.aklivity.zilla.runtime.command.metrics.internal.layout.Layout.Mode.READ_ONLY;
 import static io.aklivity.zilla.runtime.command.metrics.internal.utils.Metric.Kind.COUNTER;
 import static io.aklivity.zilla.runtime.command.metrics.internal.utils.Metric.Kind.GAUGE;
 import static io.aklivity.zilla.runtime.command.metrics.internal.utils.Metric.Kind.HISTOGRAM;
@@ -37,12 +36,12 @@ import com.github.rvesse.airline.annotations.Option;
 
 import io.aklivity.zilla.runtime.command.ZillaCommand;
 import io.aklivity.zilla.runtime.command.metrics.internal.labels.LabelManager;
-import io.aklivity.zilla.runtime.command.metrics.internal.layout.CountersLayout;
-import io.aklivity.zilla.runtime.command.metrics.internal.layout.GaugesLayout;
-import io.aklivity.zilla.runtime.command.metrics.internal.layout.HistogramsLayout;
-import io.aklivity.zilla.runtime.command.metrics.internal.layout.MetricsLayout;
 import io.aklivity.zilla.runtime.command.metrics.internal.processor.MetricsProcessor;
 import io.aklivity.zilla.runtime.command.metrics.internal.utils.Metric;
+import io.aklivity.zilla.runtime.engine.metrics.layout.CountersLayoutRO;
+import io.aklivity.zilla.runtime.engine.metrics.layout.GaugesLayoutRO;
+import io.aklivity.zilla.runtime.engine.metrics.layout.HistogramsLayoutRO;
+import io.aklivity.zilla.runtime.engine.metrics.layout.MetricsLayoutRO;
 
 @Command(name = "metrics", description = "Show engine metrics")
 public final class ZillaMetricsCommand extends ZillaCommand
@@ -66,7 +65,7 @@ public final class ZillaMetricsCommand extends ZillaCommand
     public void run()
     {
         String binding = args != null && args.size() >= 1 ? args.get(0) : null;
-        Map<Metric.Kind, List<MetricsLayout>> layouts = Map.of();
+        Map<Metric.Kind, List<MetricsLayoutRO>> layouts = Map.of();
         try
         {
             layouts = Map.of(
@@ -87,24 +86,24 @@ public final class ZillaMetricsCommand extends ZillaCommand
         }
         finally
         {
-            Map<Metric.Kind, List<MetricsLayout>> layouts0 = layouts;
-            layouts.keySet().stream().flatMap(kind -> layouts0.get(kind).stream()).forEach(MetricsLayout::close);
+            Map<Metric.Kind, List<MetricsLayoutRO>> layouts0 = layouts;
+            layouts.keySet().stream().flatMap(kind -> layouts0.get(kind).stream()).forEach(MetricsLayoutRO::close);
         }
     }
 
-    private List<MetricsLayout> countersLayouts() throws IOException
+    private List<MetricsLayoutRO> countersLayouts() throws IOException
     {
         Stream<Path> files = Files.walk(METRICS_DIRECTORY, 1);
         return files.filter(this::isCountersFile).map(this::newCountersLayout).collect(toList());
     }
 
-    private List<MetricsLayout> gaugesLayouts() throws IOException
+    private List<MetricsLayoutRO> gaugesLayouts() throws IOException
     {
         Stream<Path> files = Files.walk(METRICS_DIRECTORY, 1);
         return files.filter(this::isGaugesFile).map(this::newGaugesLayout).collect(toList());
     }
 
-    private List<MetricsLayout> histogramsLayouts() throws IOException
+    private List<MetricsLayoutRO> histogramsLayouts() throws IOException
     {
         Stream<Path> files = Files.walk(METRICS_DIRECTORY, 1);
         return files.filter(this::isHistogramsFile).map(this::newHistogramsLayout).collect(toList());
@@ -134,21 +133,21 @@ public final class ZillaMetricsCommand extends ZillaCommand
                 Files.isRegularFile(path);
     }
 
-    private CountersLayout newCountersLayout(
+    private CountersLayoutRO newCountersLayout(
         Path path)
     {
-        return new CountersLayout.Builder().path(path).mode(READ_ONLY).build();
+        return new CountersLayoutRO.Builder().path(path).build();
     }
 
-    private GaugesLayout newGaugesLayout(
+    private GaugesLayoutRO newGaugesLayout(
         Path path)
     {
-        return new GaugesLayout.Builder().path(path).mode(READ_ONLY).build();
+        return new GaugesLayoutRO.Builder().path(path).build();
     }
 
-    private HistogramsLayout newHistogramsLayout(
+    private HistogramsLayoutRO newHistogramsLayout(
         Path path)
     {
-        return new HistogramsLayout.Builder().path(path).mode(READ_ONLY).build();
+        return new HistogramsLayoutRO.Builder().path(path).build();
     }
 }
