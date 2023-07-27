@@ -10,4 +10,8 @@ WARRANTIES OF ANY KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations under the License.
 
 This project includes:
+  json-path under The Apache Software License, Version 2.0
+  Pebble under BSD 3-Clause License
+  SLF4J API Module under MIT License
+  unbescape under The Apache Software License, Version 2.0
 

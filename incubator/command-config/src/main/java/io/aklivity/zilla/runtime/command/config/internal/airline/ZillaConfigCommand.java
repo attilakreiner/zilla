@@ -18,16 +18,25 @@ import static io.aklivity.zilla.runtime.engine.EngineConfiguration.ENGINE_DIRECT
 import static org.agrona.LangUtil.rethrowUnchecked;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 import io.aklivity.zilla.runtime.command.ZillaCommand;
 import io.aklivity.zilla.runtime.engine.EngineConfiguration;
+import io.pebbletemplates.pebble.PebbleEngine;
+import io.pebbletemplates.pebble.template.PebbleTemplate;
 
 @Command(name = "config", description = "Generate configuration file")
 public final class ZillaConfigCommand extends ZillaCommand
@@ -56,6 +65,46 @@ public final class ZillaConfigCommand extends ZillaCommand
         {
             System.out.println("engine directory: " + engineDirectory());
             System.out.println("output: " + output);
+        }
+        pebble();
+        jsonpath();
+    }
+
+    public void pebble()
+    {
+        System.out.println("pebble");
+        PebbleEngine engine = new PebbleEngine.Builder().build();
+        PebbleTemplate template = engine.getLiteralTemplate("Hello {{ name }}!");
+        Map<String, Object> context = new HashMap<>();
+        context.put("name", "Pebble");
+        Writer writer = new StringWriter();
+        try
+        {
+            template.evaluate(writer, context);
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+            rethrowUnchecked(ex);
+        }
+        System.out.println(writer);
+    }
+
+    public void jsonpath()
+    {
+        System.out.println("jsonpath");
+        String json = "{\"library\": {\"greeting\": \"Hello jsonpath!\" } }";
+        DocumentContext context = JsonPath.parse(json);
+        String greeting;
+        try
+        {
+            greeting = context.read("$.library.greeting");
+            System.out.println(greeting);
+        }
+        catch (PathNotFoundException ex)
+        {
+            ex.printStackTrace();
+            rethrowUnchecked(ex);
         }
     }
 
