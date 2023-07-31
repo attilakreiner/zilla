@@ -1,0 +1,8 @@
+hello:
+  string: Zilla
+  integer: 42
+  double: 0.77
+  boolean: true
+  question: universe
+  array:
+    - name: Aklivity

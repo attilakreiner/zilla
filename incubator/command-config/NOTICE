@@ -10,8 +10,13 @@ WARRANTIES OF ANY KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations under the License.
 
 This project includes:
+  Jackson-annotations under The Apache Software License, Version 2.0
+  Jackson-core under The Apache Software License, Version 2.0
+  jackson-databind under The Apache Software License, Version 2.0
+  Jackson-dataformat-YAML under The Apache Software License, Version 2.0
   json-path under The Apache Software License, Version 2.0
   Pebble under BSD 3-Clause License
   SLF4J API Module under MIT License
+  SnakeYAML under Apache License, Version 2.0
   unbescape under The Apache Software License, Version 2.0
 

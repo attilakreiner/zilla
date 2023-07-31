@@ -1,0 +1,137 @@
+---
+name: example
+test: Hello {{ resolve("$.info.title") }}
+vaults:
+  client:
+    type: filesystem
+    options:
+      trust:
+        store: tls/truststore.p12
+        type: pkcs12
+        password: ${{env.KEYSTORE_PASSWORD}}
+  server:
+    type: filesystem
+    options:
+      keys:
+        store: tls/localhost.p12
+        type: pkcs12
+        password: ${{env.KEYSTORE_PASSWORD}}
+guards:
+  jwt0:
+    type: {{ resolve("$.components.securitySchemes.bearerAuth.bearerFormat") }}
+    options:
+      issuer: https://auth.example.com
+      audience: https://api.example.com
+      keys:
+        - kty: RSA
+          n: qqEu50hX+43Bx4W1UYWnAVKwFm+vDbP0kuIOSLVNa+HKQdHTf+3Sei5UCnkskn796izA29D0DdCy3ET9oaKRHIJyKbqFl0rv6f516QzOoXKC6N01sXBHBE/ovs0wwDvlaW+gFGPgkzdcfUlyrWLDnLV7LcuQymhTND2uH0oR3wJnNENN/OFgM1KGPPDOe19YsIKdLqARgxrhZVsh06OurEviZTXOBFI5r+yac7haDwOQhLHXNv+Y9MNvxs5QLWPFIM3bNUWfYrJnLrs4hGJS+y/KDM9Si+HL30QAFXy4YNO33J8DHjZ7ddG5n8/FqplOKvRtUgjcKWlxoGY4VdVaDQ==
+          e: AQAB
+          alg: RS256
+          kid: example
+schemas:
+  schema0:
+    type: inline
+    options:
+      format: {% if resolve("$.components.schemas.Item.type") == "object" %}JSON{% endif %}
+      source:
+        - Item:
+            type: {{ resolve("$.components.schemas.Item.type") }}
+            properties:
+              greeting:
+                type: {{ resolve("$.components.schemas.Item.properties.greeting.type") }}
+            required:
+              - {components.schemas.Item.required}
+bindings:
+  tcp_server0:
+    type: tcp
+    kind: server
+    options:
+      host: 0.0.0.0
+      port: {servers.url(prefix) == https == servers.url.port}
+    exit: tls_server0
+  tcp_server1:
+    type: tcp
+    kind: server
+    options:
+      host: 0.0.0.0
+      port: {servers.url(prefix) == http == servers.url.port}
+    exit: http_server0
+  tls_server0:
+    type: tls
+    kind: server
+    vault: server
+    options:
+      keys:
+        - localhost
+      sni:
+        - localhost
+      alpn:
+        - h2
+    exit: http_server0
+  http_server0:
+    type: http
+    kind: server
+    options:
+      authorization:
+        jwt0:
+          credentials:
+            headers:
+              authorization: Bearer {credentials}
+      access-control:
+        policy: cross-origin
+    routes:
+      - guarded:
+          jwt0:
+            - echo:stream
+        schemas:
+          - {paths.(0).(0).requestBody.content.(0).schema.$ref}
+        when:
+          - headers:
+              :path: {paths.(0)}
+              :method: {paths.(0).(0)}
+        exit: http_client0
+      - guarded:
+          jwt0:
+            - echo:stream
+        when:
+          - headers:
+              :path: {paths.(0)}
+              :method: {paths.(0).(1)}
+              :query:
+                - {paths.(0).(1).parameters.name}:
+                    type: {paths.(0).(1).parameters.schema.format}
+        exit: http_client0
+      - when:
+          - headers:
+              :path: {paths.(1)}
+              :method: {paths.(1).(0)}
+          - headers:
+              :path: {paths.(1)}
+              :method: {paths.(1).(1)}
+          - headers:
+              :path: {paths.(1)}
+              :method: {paths.(1).(2)}
+        exit: http_client0
+  http_client0:
+    type: http
+    kind: client
+    exit: tls_client0
+  tls_client0:
+    type: tls
+    kind: client
+    vault: client
+    options:
+      trustcacerts: true
+      trust:
+        - nginx
+      sni:
+        - nginx
+      alpn:
+        - h2
+    exit: tcp_client0
+  tcp_client0:
+    type: tcp
+    kind: client
+    options:
+      host: nginx
+      port: 443
