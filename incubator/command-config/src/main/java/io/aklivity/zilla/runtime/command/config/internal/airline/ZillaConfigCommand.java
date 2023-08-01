@@ -67,7 +67,7 @@ public final class ZillaConfigCommand extends ZillaCommand
         }
         TemplateRenderer renderer = new TemplateRenderer(input);
         Writer writer = new StringWriter();
-        renderer.render(writer, "template.yaml");
+        renderer.render(writer, "openapi.template.yaml");
         // TODO: Ati
         System.out.println(writer);
     }

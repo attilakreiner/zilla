@@ -1,9 +1,11 @@
 ---
 name: test
 quoteBraces: {{ "${{env.NAME}}" }}
-string: Hello {{ resolve("$.hello.string") }}!
-integer: {{ resolve("$.hello.integer") }}
-double: {{ resolve("$.hello.double") }}
-boolean: {{ resolve("$.hello.boolean") }}
-firstName: {{ resolve("$.hello.array[0].name") }}
-answer: {% if(resolve("$.hello.question")) == "universe" %}{{ resolve("$.hello.integer") }}{% else %}none{% endif %}
+string: Hello {{ resolve("/hello/string") }}!
+integer: {{ resolve("/hello/integer") }}
+double: {{ resolve("/hello/double") }}
+boolean: {{ resolve("/hello/boolean") }}
+firstName: {{ resolve("/hello/array/0/name") }}
+answer: {% if(resolve("/hello/question")) == "universe" %}{{ resolve("/hello/integer") }}{% else %}none{% endif %}
+node:
+{{ resolve("/hello/array") }}

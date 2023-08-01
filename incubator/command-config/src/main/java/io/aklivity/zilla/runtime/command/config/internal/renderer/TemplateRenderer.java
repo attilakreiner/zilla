@@ -22,10 +22,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 
 import io.pebbletemplates.pebble.PebbleEngine;
 import io.pebbletemplates.pebble.template.PebbleTemplate;
@@ -37,8 +36,8 @@ public class TemplateRenderer
     public TemplateRenderer(
         Path input)
     {
-        DocumentContext jsonPath = initJsonPath(input);
-        ConfigCommandExtension extension = new ConfigCommandExtension(jsonPath);
+        JsonNode jsonNode = initJsonNode(input);
+        ConfigCommandExtension extension = new ConfigCommandExtension(jsonNode);
         this.pebble = initPebble(extension);
     }
 
@@ -60,25 +59,21 @@ public class TemplateRenderer
         }
     }
 
-    private DocumentContext initJsonPath(
+    private JsonNode initJsonNode(
         Path input)
     {
-        DocumentContext jsonPathContext = null;
+        JsonNode jsonNode = null;
         try
         {
-            String yaml = Files.readString(input);
             ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
-            Object object = yamlReader.readValue(yaml, Object.class);
-            ObjectMapper jsonWriter = new ObjectMapper();
-            String json = jsonWriter.writeValueAsString(object);
-            jsonPathContext = JsonPath.parse(json);
+            jsonNode = yamlReader.readTree(input.toFile());
         }
         catch (IOException ex)
         {
             ex.printStackTrace();
             rethrowUnchecked(ex);
         }
-        return jsonPathContext;
+        return jsonNode;
     }
 
     private PebbleEngine initPebble(

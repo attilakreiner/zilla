@@ -1,6 +1,5 @@
 ---
 name: example
-test: Hello {{ resolve("$.info.title") }}
 vaults:
   client:
     type: filesystem
@@ -8,17 +7,17 @@ vaults:
       trust:
         store: tls/truststore.p12
         type: pkcs12
-        password: ${{env.KEYSTORE_PASSWORD}}
+        password: {{ "${{env.KEYSTORE_PASSWORD}}" }}
   server:
     type: filesystem
     options:
       keys:
         store: tls/localhost.p12
         type: pkcs12
-        password: ${{env.KEYSTORE_PASSWORD}}
+        password: {{ "${{env.KEYSTORE_PASSWORD}}" }}
 guards:
   jwt0:
-    type: {{ resolve("$.components.securitySchemes.bearerAuth.bearerFormat") }}
+    type: {{ resolve("/components/securitySchemes/bearerAuth/bearerFormat") }}
     options:
       issuer: https://auth.example.com
       audience: https://api.example.com
@@ -32,13 +31,13 @@ schemas:
   schema0:
     type: inline
     options:
-      format: {% if resolve("$.components.schemas.Item.type") == "object" %}JSON{% endif %}
+      format: {% if resolve("/components/schemas/Item/type") == "object" %}JSON{% endif %}
       source:
         - Item:
-            type: {{ resolve("$.components.schemas.Item.type") }}
+            type: {{ resolve("/components/schemas/Item/type") }}
             properties:
               greeting:
-                type: {{ resolve("$.components.schemas.Item.properties.greeting.type") }}
+                type: {{ resolve("/components/schemas/Item/properties/greeting/type") }}
             required:
               - {components.schemas.Item.required}
 bindings:

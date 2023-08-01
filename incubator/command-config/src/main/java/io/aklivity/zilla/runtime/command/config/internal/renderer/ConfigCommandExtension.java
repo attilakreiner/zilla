@@ -16,24 +16,24 @@ package io.aklivity.zilla.runtime.command.config.internal.renderer;
 
 import java.util.Map;
 
-import com.jayway.jsonpath.DocumentContext;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import io.pebbletemplates.pebble.extension.AbstractExtension;
 import io.pebbletemplates.pebble.extension.Function;
 
 public class ConfigCommandExtension extends AbstractExtension
 {
-    private final DocumentContext jsonPathContext;
+    private final JsonNode jsonNode;
 
     public ConfigCommandExtension(
-        DocumentContext jsonPathContext)
+        JsonNode jsonNode)
     {
-        this.jsonPathContext = jsonPathContext;
+        this.jsonNode = jsonNode;
     }
 
     @Override
     public Map<String, Function> getFunctions()
     {
-        return Map.of("resolve", new ResolveStringFunction(jsonPathContext));
+        return Map.of("resolve", new ResolveStringFunction(jsonNode));
     }
 }

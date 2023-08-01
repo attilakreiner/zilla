@@ -1,0 +1,17 @@
+---
+name: test
+quoteBraces: ${{env.NAME}}
+string: Hello Zilla!
+integer: 42
+double: 0.77
+boolean: true
+firstName: Aklivity
+answer: 42
+node:
+- name: Aklivity
+  type: company
+- name: orange
+  type: fruit
+  nested:
+  - value: 7
+

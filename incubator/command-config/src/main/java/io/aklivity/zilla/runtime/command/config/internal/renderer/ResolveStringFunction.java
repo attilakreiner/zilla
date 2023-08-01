@@ -19,8 +19,11 @@ import static org.agrona.LangUtil.rethrowUnchecked;
 import java.util.List;
 import java.util.Map;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.PathNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
 import io.pebbletemplates.pebble.extension.Function;
 import io.pebbletemplates.pebble.template.EvaluationContext;
@@ -28,12 +31,17 @@ import io.pebbletemplates.pebble.template.PebbleTemplate;
 
 public class ResolveStringFunction implements Function
 {
-    private final DocumentContext jsonPathContext;
+    private final JsonNode jsonNode;
+    private final ObjectMapper yamlWriter;
 
     public ResolveStringFunction(
-        DocumentContext jsonPathContext)
+        JsonNode jsonNode)
     {
-        this.jsonPathContext = jsonPathContext;
+        this.jsonNode = jsonNode;
+        YAMLFactory yamlFactory = new YAMLFactory()
+            .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+            .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES);
+        yamlWriter = new ObjectMapper(yamlFactory);
     }
 
     @Override
@@ -44,7 +52,7 @@ public class ResolveStringFunction implements Function
         int lineNumber)
     {
         String expression = (String)args.get("expression");
-        return resolveJsonPath(expression);
+        return resolveExpression(expression);
     }
 
     @Override
@@ -53,16 +61,33 @@ public class ResolveStringFunction implements Function
         return List.of("expression");
     }
 
-    private String resolveJsonPath(
+    private String resolveExpression(
         String expression)
+    {
+        String result;
+        JsonNode node = jsonNode.at(expression);
+        switch (node.getNodeType())
+        {
+        case ARRAY:
+        case OBJECT:
+            result = toYaml(node);
+            break;
+        default:
+            result = node.asText();
+            break;
+        }
+        return result;
+    }
+
+    private String toYaml(
+        JsonNode node)
     {
         String result = "";
         try
         {
-            Object object = jsonPathContext.read(expression);
-            result = String.valueOf(object);
+            result = yamlWriter.writeValueAsString(node);
         }
-        catch (PathNotFoundException ex)
+        catch (JsonProcessingException ex)
         {
             ex.printStackTrace();
             rethrowUnchecked(ex);

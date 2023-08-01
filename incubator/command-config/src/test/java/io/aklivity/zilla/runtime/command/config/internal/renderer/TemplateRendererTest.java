@@ -19,6 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
@@ -29,16 +30,8 @@ public class TemplateRendererTest
     public void shouldRenderTemplate() throws Exception
     {
         // GIVEN
-        String expectedResult =
-            "---\n" +
-            "name: test\n" +
-            "quoteBraces: ${{env.NAME}}\n" +
-            "string: Hello Zilla!\n" +
-            "integer: 42\n" +
-            "double: 0.77\n" +
-            "boolean: true\n" +
-            "firstName: Aklivity\n" +
-            "answer: 42\n";
+        Path expectedPath = Path.of(getClass().getResource("expected.yaml").toURI());
+        String expectedResult = Files.readString(expectedPath);
         Path inputPath = Path.of(getClass().getResource("input.yaml").toURI());
         TemplateRenderer renderer = new TemplateRenderer(inputPath);
         Writer writer = new StringWriter();
