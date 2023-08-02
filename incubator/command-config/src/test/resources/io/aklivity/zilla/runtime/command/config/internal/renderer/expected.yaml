@@ -14,4 +14,8 @@ node:
   type: fruit
   nested:
   - value: 7
-
+indented:
+  node:
+    here:
+      name: Aklivity
+      type: company

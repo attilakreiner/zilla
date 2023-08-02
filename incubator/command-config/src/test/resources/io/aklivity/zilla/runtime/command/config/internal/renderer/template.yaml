@@ -9,3 +9,7 @@ firstName: {{ resolve("/hello/array/0/name") }}
 answer: {% if(resolve("/hello/question")) == "universe" %}{{ resolve("/hello/integer") }}{% else %}none{% endif %}
 node:
 {{ resolve("/hello/array") }}
+indented:
+  node:
+    here:
+{{ resolve("/hello/array/0") | indent(6) }}

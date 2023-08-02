@@ -19,6 +19,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.pebbletemplates.pebble.extension.AbstractExtension;
+import io.pebbletemplates.pebble.extension.Filter;
 import io.pebbletemplates.pebble.extension.Function;
 
 public class ConfigCommandExtension extends AbstractExtension
@@ -35,5 +36,11 @@ public class ConfigCommandExtension extends AbstractExtension
     public Map<String, Function> getFunctions()
     {
         return Map.of("resolve", new ResolveStringFunction(jsonNode));
+    }
+
+    @Override
+    public Map<String, Filter> getFilters()
+    {
+        return Map.of("indent", new IndentFilter());
     }
 }

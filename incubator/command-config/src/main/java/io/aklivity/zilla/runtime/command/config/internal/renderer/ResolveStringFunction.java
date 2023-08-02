@@ -86,6 +86,10 @@ public class ResolveStringFunction implements Function
         try
         {
             result = yamlWriter.writeValueAsString(node);
+            if (result.endsWith("\n"))
+            {
+                result = result.substring(0, result.length() - 1);
+            }
         }
         catch (JsonProcessingException ex)
         {
