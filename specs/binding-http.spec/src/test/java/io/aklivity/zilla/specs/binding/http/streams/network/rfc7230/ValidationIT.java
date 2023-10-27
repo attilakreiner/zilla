@@ -48,8 +48,8 @@ public class ValidationIT
 
     @Test
     @Specification({
-        "${net}/invalid/client",
-        "${net}/invalid/server" })
+        "${net}/invalid.header/client",
+        "${net}/invalid.header/server" })
     public void shouldRejectInvalidRequests() throws Exception
     {
         k3po.start();
