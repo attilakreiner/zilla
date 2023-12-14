@@ -15,7 +15,17 @@
 
 ]]
 
-zilla_protocol = Proto("Zilla", "Zilla Frames")
+function resolve_protocol_name(version)
+    if version == string.format("@%s@", "version") or version == "develop-SNAPSHOT" then
+        return "Zilla_dev"
+    else
+        return string.format("Zilla_%s", version)
+    end
+end
+
+zilla_version = "@version@"
+protocol_name = resolve_protocol_name(zilla_version)
+zilla_protocol = Proto(protocol_name, "Zilla Frames")
 
 HEADER_OFFSET = 0
 LABELS_OFFSET = 16
@@ -639,5 +649,5 @@ function add_string_as_subtree(buffer, tree, label_format, slice_type_id, slice_
     subtree:add(field_text, slice_text)
 end
 
-local data_dissector = DissectorTable.get("tcp.port")
+data_dissector = DissectorTable.get("tcp.port")
 data_dissector:add(7114, zilla_protocol)
