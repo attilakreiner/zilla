@@ -21,6 +21,8 @@ import java.util.function.LongSupplier;
 import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 
+import io.aklivity.zilla.runtime.binding.http.internal.types.Array32FW;
+import io.aklivity.zilla.runtime.binding.http.internal.types.HttpHeaderFW;
 import io.aklivity.zilla.runtime.binding.http.internal.types.event.HttpEventFW;
 import io.aklivity.zilla.runtime.binding.http.internal.types.event.Result;
 import io.aklivity.zilla.runtime.engine.EngineContext;
@@ -60,6 +62,36 @@ public class HttpEventContext
                 .result(r -> r.set(result))
                 .identity(identity)
             )
+            .build();
+        logger.accept(httpTypeId, event.buffer(), event.offset(), event.limit());
+    }
+
+    public void request(
+        long traceId,
+        long routedId,
+        Array32FW<HttpHeaderFW> headers)
+    {
+        HttpEventFW event = httpEventRW
+            .wrap(eventBuffer, 0, eventBuffer.capacity())
+            .request(e -> e
+                .traceId(traceId)
+                .namespacedId(routedId)
+                .headers(headers))
+            .build();
+        logger.accept(httpTypeId, event.buffer(), event.offset(), event.limit());
+    }
+
+    public void response(
+        long traceId,
+        long routedId,
+        Array32FW<HttpHeaderFW> headers)
+    {
+        HttpEventFW event = httpEventRW
+            .wrap(eventBuffer, 0, eventBuffer.capacity())
+            .response(e -> e
+                .traceId(traceId)
+                .namespacedId(routedId)
+                .headers(headers))
             .build();
         logger.accept(httpTypeId, event.buffer(), event.offset(), event.limit());
     }

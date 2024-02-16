@@ -2272,6 +2272,11 @@ public final class HttpServerFactory implements HttpStreamFactory
                 final HttpHeaderFW connection = beginEx.headers().matchFirst(h -> HEADER_CONNECTION.equals(h.name()));
                 exchange.responseClosing = connection != null && connectionClose.reset(connection.value().asString()).matches();
 
+                System.out.println("http request begin");
+                beginEx.headers().forEach(i -> System.out.println(i));
+                System.out.println("---");
+                event.request(traceId, routedId, beginEx.headers());
+
                 this.exchange = exchange;
             }
             return headersValid;
@@ -2998,6 +3003,11 @@ public final class HttpServerFactory implements HttpStreamFactory
 
                 final HttpBeginExFW beginEx = begin.extension().get(beginExRO::tryWrap);
                 final Array32FW<HttpHeaderFW> headers = beginEx != null ? beginEx.headers() : DEFAULT_HEADERS;
+
+                System.out.println("http response begin");
+                headers.forEach(i -> System.out.println(i));
+                System.out.println("---");
+                event.response(traceId, routedId, headers);
 
                 responseState = HttpExchangeState.OPEN;
                 doEncodeHeaders(this, traceId, sessionId, 0L, headers);
@@ -4927,6 +4937,14 @@ public final class HttpServerFactory implements HttpStreamFactory
             else
             {
                 final Map<String, String> headers = headersDecoder.headers;
+                System.out.println("http2 request begin");
+                headers.forEach((k, v) ->
+                {
+                    System.out.printf("%s = %s%n", k, v);
+                }
+                );
+                System.out.println("---");
+
 
                 if (isCorsPreflightRequest(headers))
                 {
@@ -6019,6 +6037,9 @@ public final class HttpServerFactory implements HttpStreamFactory
                 final HttpHeaderFW contentLengthHeader = headers.matchFirst(header ->
                         header.name().equals(HEADER_CONTENT_LENGTH));
                 responseContentLength = contentLengthHeader != null ? parseInt(contentLengthHeader.value().asString()) : -1;
+
+                System.out.println("http2 response begin");
+                headers.forEach(i -> System.out.println(i));
 
                 doEncodeHeaders(traceId, authorization, streamId, policy, origin, headers, responseContentLength == 0);
             }
