@@ -25,6 +25,9 @@ import io.aklivity.zilla.runtime.binding.tls.internal.types.event.TlsEventFW;
 import io.aklivity.zilla.runtime.engine.EngineContext;
 import io.aklivity.zilla.runtime.engine.binding.function.MessageConsumer;
 
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
+
 public class TlsEventContext
 {
     private static final int EVENT_BUFFER_CAPACITY = 1024;
@@ -45,7 +48,8 @@ public class TlsEventContext
 
     public void tlsFailed(
         long traceId,
-        long routedId)
+        long routedId,
+        SSLEngine tlsEngine)
     {
         TlsEventFW event = tlsEventRW
             .wrap(eventBuffer, 0, eventBuffer.capacity())
@@ -55,6 +59,14 @@ public class TlsEventContext
                 .namespacedId(routedId)
             )
             .build();
+        /*tlsEngine.getSession().getCipherSuite();
+        tlsEngine.getSession().getProtocol();*/
+        /*tlsEngine.getHandshakeSession().getCipherSuite();
+        tlsEngine.getHandshakeSession().getPeerHost(); ????
+        tlsEngine.getHandshakeSession().getPeerPort(); ????
+        tlsEngine.getHandshakeSession().getProtocol();*/
+        //tlsEngine.getSSLParameters();
+        SSLSession session = tlsEngine.getSession();
         eventWriter.accept(tlsTypeId, event.buffer(), event.offset(), event.limit());
     }
 

@@ -121,6 +121,7 @@ public class JwtGuardHandler implements GuardHandler
         String credentials)
     {
         JwtSession session = null;
+        String subject = null;
 
         authorize:
         try
@@ -161,7 +162,7 @@ public class JwtGuardHandler implements GuardHandler
                 break authorize;
             }
 
-            String subject = claims.getSubject();
+            subject = claims.getSubject();
             List<String> roles = Optional.ofNullable(claims.getClaimValue("scope"))
                 .map(s -> s.toString().intern())
                 .map(s -> s.split("\\s+"))
@@ -185,7 +186,11 @@ public class JwtGuardHandler implements GuardHandler
         {
             // not authorized
         }
-
+        if (session == null)
+        {
+            // log the failure, subject -> identity
+            // event.authorizationFailed(...)
+        }
         return session != null ? session.authorized : NOT_AUTHORIZED;
     }
 

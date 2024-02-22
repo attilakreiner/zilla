@@ -1810,7 +1810,7 @@ public final class KafkaClientMetaFactory extends KafkaClientSaslHandshaker impl
                     newPartitions.clear();
                     break;
                 default:
-                    onDecodeResponseErrorCode(traceId, errorCode);
+                    onDecodeResponseErrorCode(traceId, originId, errorCode);
                     final KafkaResetExFW resetEx = kafkaResetExRW.wrap(extBuffer, 0, extBuffer.capacity())
                                                                  .typeId(kafkaTypeId)
                                                                  .error(errorCode)
@@ -1833,7 +1833,7 @@ public final class KafkaClientMetaFactory extends KafkaClientSaslHandshaker impl
                 }
                 else
                 {
-                    onDecodeResponseErrorCode(traceId, partitionError);
+                    onDecodeResponseErrorCode(traceId, originId, partitionError);
                 }
             }
 

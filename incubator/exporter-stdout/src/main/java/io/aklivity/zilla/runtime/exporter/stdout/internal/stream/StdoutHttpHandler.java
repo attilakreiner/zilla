@@ -26,7 +26,8 @@ import io.aklivity.zilla.runtime.exporter.stdout.internal.types.event.HttpReques
 public class StdoutHttpHandler extends EventHandler
 {
     private static final String AUTHORIZATION_FAILED_FORMAT = "AUTHORIZATION_FAILED %s %s [%s]%n";
-    private static final String REQUEST_ACCEPTED_FORMAT = "REQUEST_ACCEPTED %s %s [%s] %s %s %s %s%n";
+    //private static final String REQUEST_ACCEPTED_FORMAT = "REQUEST_ACCEPTED %s %s [%s] %s %s %s %s%n";
+    private static final String REQUEST_ACCEPTED_FORMAT = "%s %s [%s] REQUEST_ACCEPTED %s %s %s %s%n";
 
     private final HttpEventFW httpEventRO = new HttpEventFW();
 

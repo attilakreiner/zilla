@@ -556,7 +556,7 @@ public final class TlsServerFactory implements TlsStreamFactory
             }
             catch (SSLException | RuntimeException ex)
             {
-                event.tlsFailed(traceId, server.routedId);
+                event.tlsFailed(traceId, server.routedId, client.tlsEngine);
                 throw ex;
             }
         }
@@ -703,7 +703,7 @@ public final class TlsServerFactory implements TlsStreamFactory
                         }
                         catch (SSLException | RuntimeException ex)
                         {
-                            event.tlsFailed(traceId, server.routedId);
+                            event.tlsFailed(traceId, server.routedId, client.tlsEngine);
                             throw ex;
                         }
                     }
@@ -916,7 +916,7 @@ public final class TlsServerFactory implements TlsStreamFactory
                 }
                 catch (SSLException | RuntimeException ex)
                 {
-                    event.tlsFailed(traceId, server.routedId);
+                    event.tlsFailed(traceId, server.routedId, client.tlsEngine);
                     throw ex;
                 }
             }
@@ -1799,7 +1799,7 @@ public final class TlsServerFactory implements TlsStreamFactory
                 }
                 catch (SSLException | RuntimeException ex)
                 {
-                    event.tlsFailed(traceId, routedId);
+                    event.tlsFailed(traceId, routedId, client.tlsEngine);
                     throw ex;
                 }
             }

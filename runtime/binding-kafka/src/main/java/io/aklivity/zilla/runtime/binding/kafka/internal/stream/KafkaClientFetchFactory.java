@@ -2949,7 +2949,7 @@ public final class KafkaClientFetchFactory extends KafkaClientSaslHandshaker imp
                     this.nextOffset = partitionOffset;
                     break;
                 default:
-                    onDecodeResponseErrorCode(traceId, errorCode);
+                    onDecodeResponseErrorCode(traceId, originId, errorCode);
                     cleanupApplication(traceId, errorCode);
                     doNetworkEnd(traceId, authorization);
                     break;
@@ -2991,7 +2991,7 @@ public final class KafkaClientFetchFactory extends KafkaClientSaslHandshaker imp
                     }
                     else
                     {
-                        onDecodeResponseErrorCode(traceId, errorCode);
+                        onDecodeResponseErrorCode(traceId, originId, errorCode);
                     }
 
                     cleanupApplication(traceId, errorCode);
